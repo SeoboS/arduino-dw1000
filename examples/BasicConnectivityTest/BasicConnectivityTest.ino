@@ -51,6 +51,7 @@ void setup() {
 void loop() {
   // DEBUG chip info and registers pretty printed
   char msg[128];
+  Serial.print(SS);
   DW1000.getPrintableDeviceIdentifier(msg);
   Serial.print("Device ID: "); Serial.println(msg);
   DW1000.getPrintableExtendedUniqueIdentifier(msg);

@@ -504,7 +504,7 @@ void DW1000Class::tune() {
 		writeValueToBytes(fsplltune, 0x26, LEN_FS_PLLTUNE);
 	} else if(_channel == CHANNEL_3) {
 		writeValueToBytes(fspllcfg, 0x08401009L, LEN_FS_PLLCFG);
-		writeValueToBytes(fsplltune, 0x56, LEN_FS_PLLTUNE);
+		writeValueToBytes(fsplltune, 0x5E, LEN_FS_PLLTUNE);
 	} else if(_channel == CHANNEL_5 || _channel == CHANNEL_7) {
 		writeValueToBytes(fspllcfg, 0x0800041DL, LEN_FS_PLLCFG);
 		writeValueToBytes(fsplltune, 0xBE, LEN_FS_PLLTUNE);
@@ -887,6 +887,7 @@ void DW1000Class::setNetworkId(uint16_t val) {
 }
 
 void DW1000Class::setDeviceAddress(uint16_t val) {
+	Serial.print("VAL: "); Serial.println(val);
 	_networkAndAddress[0] = (byte)(val & 0xFF);
 	_networkAndAddress[1] = (byte)((val >> 8) & 0xFF);
 }
@@ -1081,7 +1082,22 @@ void DW1000Class::commitConfiguration() {
 	// TODO clean up code + antenna delay/calibration API
 	// TODO setter + check not larger two bytes integer
 	byte antennaDelayBytes[LEN_STAMP];
-	writeValueToBytes(antennaDelayBytes, 16384, LEN_STAMP);
+	int antennaDelayTime = 16384;
+
+	if(_networkAndAddress[0] == 0x00 && _networkAndAddress[1] == 0x00){
+		antennaDelayTime = 16384;
+	}
+	else if(_networkAndAddress[0] == 0x11 && _networkAndAddress[1] == 0x11){
+		antennaDelayTime = 16480;
+	}
+	else if(_networkAndAddress[0] == 0x22 && _networkAndAddress[1] == 0x22){
+		antennaDelayTime = 16513;
+	}
+	else if(_networkAndAddress[0] == 0x33 && _networkAndAddress[1] == 0x33){
+		antennaDelayTime = 16424;
+	}
+
+	writeValueToBytes(antennaDelayBytes, antennaDelayTime, LEN_STAMP);
 	_antennaDelay.setTimestamp(antennaDelayBytes);
 	writeBytes(TX_ANTD, NO_SUB, antennaDelayBytes, LEN_TX_ANTD);
 	writeBytes(LDE_IF, LDE_RXANTD_SUB, antennaDelayBytes, LEN_LDE_RXANTD);
@@ -1222,7 +1238,7 @@ void DW1000Class::setDefaults() {
 		
 	} else if(_deviceMode == IDLE_MODE) {
 		useExtendedFrameLength(false);
-		useSmartPower(false);
+		useSmartPower(true); //  changed from false to true
 		suppressFrameCheck(false);
 		//for global frame filtering
 		setFrameFilter(false);

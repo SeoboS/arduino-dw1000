@@ -51,7 +51,7 @@
 
 //Default value
 //in ms
-#define DEFAULT_RESET_PERIOD 200
+#define DEFAULT_RESET_PERIOD 2000 // changed from 200 to 2000
 //in us
 #define DEFAULT_REPLY_DELAY_TIME 7000
 
@@ -60,7 +60,9 @@
 #define ANCHOR 1
 
 //default timer delay
-#define DEFAULT_TIMER_DELAY 80
+#define DEFAULT_TIMER_DELAY 80 
+// 
+//what is this?
 
 //debug mode
 #ifndef DEBUG
